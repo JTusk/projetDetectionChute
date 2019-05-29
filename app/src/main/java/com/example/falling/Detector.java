@@ -72,10 +72,10 @@ public class Detector extends Service implements SensorEventListener {
 
                 if(calcul>20){
                     Toast.makeText(this, Double.toString(calcul), Toast.LENGTH_SHORT).show();
-                    Intent sms = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:0648630421"));
+                    /*Intent sms = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:0648630421"));
                     sms.putExtra("sms_body", "Wooooohhhh si t'as ce sms...ça marche bro' !");
                     sms.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(sms);
+                    startActivity(sms);*/
 
                     try {
                         SmsManager smsManager = SmsManager.getDefault();
