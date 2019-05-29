@@ -39,7 +39,7 @@ public class Detector extends Service implements SensorEventListener {
         if(sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null){
 
             Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            sensorManager.registerListener(this,sensor,SensorManager.SENSOR_DELAY_NORMAL);
+            sensorManager.registerListener(this,sensor,SensorManager.SENSOR_DELAY_FASTEST);
 
         }else{
             Toast.makeText(getApplicationContext(), "Aucun accelerométre présent sur ce téléphone", Toast.LENGTH_LONG).show();
@@ -68,10 +68,10 @@ public class Detector extends Service implements SensorEventListener {
             if((currentTime - lastUpdate) > INTERVAL){
                 lastUpdate = currentTime;
                 float[] accelerometre_values = event.values.clone();
-                //double calcul = Math.sqrt(accelerometre_values[0]*accelerometre_values[0] + accelerometre_values[1]*accelerometre_values[1] + accelerometre_values[2]*accelerometre_values[2]);
+                double calcul = Math.sqrt(accelerometre_values[0]*accelerometre_values[0] + accelerometre_values[1]*accelerometre_values[1] + accelerometre_values[2]*accelerometre_values[2]);
 
-                if(accelerometre_values[2]>14){
-                    Toast.makeText(this, Double.toString(accelerometre_values[2]), Toast.LENGTH_SHORT).show();
+                if(calcul>20){
+                    Toast.makeText(this, Double.toString(calcul), Toast.LENGTH_SHORT).show();
                     Intent sms = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:0648630421"));
                     sms.putExtra("sms_body", "Wooooohhhh si t'as ce sms...ça marche bro' !");
                     sms.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
