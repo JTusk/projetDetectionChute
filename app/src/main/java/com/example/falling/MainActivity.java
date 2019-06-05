@@ -27,6 +27,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private final static int MY_PERMISSIONS_REQUEST_CALL_PHONE = 123;
+    private final static int MY_PERMISSIONS_REQUEST_SEND_SMS = 124;
 
 
     @Override
@@ -35,7 +36,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         Switch simpleSwitch = (Switch) findViewById(R.id.switch1);
 
-        simpleSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, MY_PERMISSIONS_REQUEST_SEND_SMS);
+        } else {
+            Intent intent = new Intent(getApplicationContext(),Detector.class);
+            startService(intent);
+        }
+        /*simpleSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
                 if (bChecked) {
@@ -45,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     finish();
                 }
             }
-        });
+        });*/
     }
 
     @Override
@@ -59,7 +67,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_CALL_PHONE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Intent intent = new Intent(getApplicationContext(),Detector.class);
+                    Intent intent = new Intent(getApplicationContext(), Detector.class);
+                    startService(intent);
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    break;
+                }
+            }
+
+
+            case MY_PERMISSIONS_REQUEST_SEND_SMS: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(getApplicationContext(), "SMS !",
+                            Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(getApplicationContext(), Detector.class);
                     startService(intent);
                 } else {
                     // permission denied, boo! Disable the
