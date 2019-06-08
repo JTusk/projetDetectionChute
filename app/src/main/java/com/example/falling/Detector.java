@@ -13,6 +13,8 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.sql.Time;
+
 public class Detector extends Service implements SensorEventListener {
 
     private static final String TAG = "Service_Detector";
@@ -32,7 +34,7 @@ public class Detector extends Service implements SensorEventListener {
 
     @Override
     public void onCreate(){
-        Toast.makeText(this, "Invoke background service onCreate method.", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Invoke background service onCreate method.", Toast.LENGTH_LONG).show();
 
         SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
@@ -51,12 +53,12 @@ public class Detector extends Service implements SensorEventListener {
     @Override
     public void onDestroy(){
         super.onDestroy();
-        Toast.makeText(this, "Invoke background service onDestroy method.", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Invoke background service onDestroy method.", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "Invoke background service onStartCommand method.", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Invoke background service onStartCommand method.", Toast.LENGTH_LONG).show();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -65,6 +67,7 @@ public class Detector extends Service implements SensorEventListener {
         long currentTime = System.currentTimeMillis();
 
         if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+            //Toast.makeText(this, currentTime + " - " + lastUpdate + " = " + (currentTime - lastUpdate), Toast.LENGTH_SHORT).show();
             if((currentTime - lastUpdate) > INTERVAL){
                 lastUpdate = currentTime;
                 float[] accelerometre_values = event.values.clone();
@@ -79,8 +82,9 @@ public class Detector extends Service implements SensorEventListener {
 
                     try {
                         SmsManager smsManager = SmsManager.getDefault();
-                        smsManager.sendTextMessage("0648630421", null, "test", null, null);
-                        Toast.makeText(getApplicationContext(), "SMS Sent!",
+                        //smsManager.sendTextMessage(ParameterActivity.numToCall, null, "test", null, null);
+                        //smsManager.sendTextMessage("0648630421", null, "Si tu as ce sms alors que le service est OFF, y'a un bug mon frère", null, null);
+                        Toast.makeText(getApplicationContext(), "SMS Sent to " + MainActivity.numToCall,
                                 Toast.LENGTH_LONG).show();
                     }
                     catch (Exception ex) {

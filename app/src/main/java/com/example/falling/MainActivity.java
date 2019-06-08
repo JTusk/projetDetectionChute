@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -17,10 +18,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -29,12 +32,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final static int MY_PERMISSIONS_REQUEST_CALL_PHONE = 123;
     private final static int MY_PERMISSIONS_REQUEST_SEND_SMS = 124;
 
+    public static String numToCall;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Switch simpleSwitch = (Switch) findViewById(R.id.switch1);
+        Switch simpleSwitch = findViewById(R.id.switch1);
+
+        //SharedPreferences sharedPref = getSharedPreferences("Parameter",Context.MODE_PRIVATE);
+        //ParameterActivity.numToCall = sharedPref.getString("numToCall","test");
+        SharedPreferences pref = getPreferences(Context.MODE_PRIVATE);
+        this.numToCall = pref.getString("numToCall","numero");
 
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
@@ -93,12 +103,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_parametre:
+                Intent aboutIntent = new Intent(MainActivity.this, ParameterActivity.class);
+                startActivity(aboutIntent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void onResume(){
+        getPreferences();
         super .onResume();
     }
 
     @Override
     protected void onPause(){
         super .onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        getPreferences();
+        SharedPreferences pref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString("numToCall", numToCall);
+        editor.commit();
+        super.onDestroy();
+    }
+
+    private void getPreferences(){
+        SharedPreferences sharedPref = getSharedPreferences("Parameter",Context.MODE_PRIVATE);
+        ParameterActivity.numToCall = sharedPref.getString("numToCall","null");
+        this.numToCall = sharedPref.getString("numToCall","numero inconnu");
     }
 }

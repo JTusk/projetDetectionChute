@@ -6,5 +6,6 @@
         android:id="@+id/action_parametre"
         android:orderInCategory="100"
         android:title="@string/action_parametre"
+        android:icon="@drawable/ic_settings_black_24dp"
         app:showAsAction="never" />
 </menu>
