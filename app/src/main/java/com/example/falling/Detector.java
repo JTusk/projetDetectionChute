@@ -1,5 +1,6 @@
 package com.example.falling;
 
+import android.app.IntentService;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -8,21 +9,44 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
+import android.content.Intent;
 
-public class Detector extends Service implements SensorEventListener {
+import static android.content.Intent.getIntent;
+
+public class Detector extends Service implements SensorEventListener, View.OnClickListener {
 
     private static final String TAG = "Service_Detector";
     private float last_accelerometre_values[];
     private final static int INTERVAL = 100;
     private long lastUpdate = -1;
+    private long nbChutes= 0;
+    private long nb=0;
+    private Handler myHandler;
 
-    public Detector() {
 
-    }
+    private Runnable myRunnable = new Runnable() {
+        @Override
+        public void run() {
+            // Code à éxécuter de façon périodique
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage("0648630421", null, "test", null, null);
+            nb++;
+            Toast.makeText(getApplicationContext(), "PERIODE",
+                    Toast.LENGTH_LONG).show();
+            myHandler.postDelayed(this,5000);
+
+            if (nb>3){
+                myHandler.removeCallbacks(myRunnable);
+
+            }
+        }
+    };
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -30,8 +54,11 @@ public class Detector extends Service implements SensorEventListener {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
+
+
     @Override
     public void onCreate(){
+
         Toast.makeText(this, "Invoke background service onCreate method.", Toast.LENGTH_LONG).show();
 
         SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -48,6 +75,8 @@ public class Detector extends Service implements SensorEventListener {
         super.onCreate();
     }
 
+
+
     @Override
     public void onDestroy(){
         super.onDestroy();
@@ -59,6 +88,8 @@ public class Detector extends Service implements SensorEventListener {
         Toast.makeText(this, "Invoke background service onStartCommand method.", Toast.LENGTH_LONG).show();
         return super.onStartCommand(intent, flags, startId);
     }
+
+
 
     @Override
     public void onSensorChanged(SensorEvent event) {
@@ -72,16 +103,23 @@ public class Detector extends Service implements SensorEventListener {
 
                 if(calcul>20){
                     Toast.makeText(this, Double.toString(calcul), Toast.LENGTH_SHORT).show();
-                    /*Intent sms = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:0648630421"));
-                    sms.putExtra("sms_body", "Wooooohhhh si t'as ce sms...ça marche bro' !");
-                    sms.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(sms);*/
 
                     try {
-                        SmsManager smsManager = SmsManager.getDefault();
-                        smsManager.sendTextMessage("0648630421", null, "test", null, null);
-                        Toast.makeText(getApplicationContext(), "SMS Sent!",
-                                Toast.LENGTH_LONG).show();
+
+
+                        myHandler = new Handler();
+                        myHandler.postDelayed(myRunnable,5000); // on redemande toute les 500ms
+
+                        if(nbChutes<1){
+                            //String name = intent.getStringExtra("SMS",null);
+                            SmsManager smsManager = SmsManager.getDefault();
+                            smsManager.sendTextMessage("0648630421", null, "test", null, null);
+                            Toast.makeText(getApplicationContext(), "CHUTE 1!",
+                                    Toast.LENGTH_LONG).show();
+                            nbChutes++;
+                        }
+
+
                     }
                     catch (Exception ex) {
                         ex.printStackTrace();
@@ -96,6 +134,11 @@ public class Detector extends Service implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    @Override
+    public void onClick(View v) {
 
     }
 }
