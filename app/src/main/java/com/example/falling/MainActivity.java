@@ -27,6 +27,10 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import java.net.URISyntaxException;
+
+import static android.content.Intent.getIntentOld;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private final static int MY_PERMISSIONS_REQUEST_CALL_PHONE = 123;
@@ -51,12 +55,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         simpleSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
+                Intent intent = new Intent(getApplicationContext(),Detector.class);
                 if (bChecked) {
-                    Intent intent = new Intent(getApplicationContext(),Detector.class);
+
                     intent.putExtra(SMSREQUEST,testSMS.toString());
                     startService(intent);
                 } else {
-                    finish();
+                    //finish();
+                    //stopService(intent);
+                    try {
+                        stopService(getIntentOld(SMSREQUEST));
+
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -68,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v){
 
     }
+
 
 
     @Override

@@ -17,7 +17,10 @@ import android.view.View;
 import android.widget.Toast;
 import android.content.Intent;
 
+import java.net.URISyntaxException;
+
 import static android.content.Intent.getIntent;
+import static android.content.Intent.getIntentOld;
 
 public class Detector extends Service implements SensorEventListener, View.OnClickListener {
 
@@ -28,6 +31,7 @@ public class Detector extends Service implements SensorEventListener, View.OnCli
     private long nbChutes= 0;
     private long nb=0;
     private Handler myHandler;
+    public final static String SMSREQUEST = "request";
 
 
     private Runnable myRunnable = new Runnable() {
@@ -35,11 +39,11 @@ public class Detector extends Service implements SensorEventListener, View.OnCli
         public void run() {
             // Code à éxécuter de façon périodique
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage("0648630421", null, "test", null, null);
+            smsManager.sendTextMessage("0648630421", null, "Relance suite à la chute", null, null);
             nb++;
-            Toast.makeText(getApplicationContext(), "PERIODE",
+            Toast.makeText(getApplicationContext(), "Relance ",
                     Toast.LENGTH_LONG).show();
-            myHandler.postDelayed(this,5000);
+            myHandler.postDelayed(this,500000);
 
             if (nb>3){
                 myHandler.removeCallbacks(myRunnable);
@@ -81,6 +85,11 @@ public class Detector extends Service implements SensorEventListener, View.OnCli
     public void onDestroy(){
         super.onDestroy();
         Toast.makeText(this, "Invoke background service onDestroy method.", Toast.LENGTH_LONG).show();
+        /*try {
+            stopService(getIntentOld(SMSREQUEST));
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }*/
     }
 
     @Override
@@ -108,12 +117,12 @@ public class Detector extends Service implements SensorEventListener, View.OnCli
 
 
                         myHandler = new Handler();
-                        myHandler.postDelayed(myRunnable,5000); // on redemande toute les 500ms
+                        myHandler.postDelayed(myRunnable,500000); // on redemande toute les 500ms
 
                         if(nbChutes<1){
                             //String name = intent.getStringExtra("SMS",null);
                             SmsManager smsManager = SmsManager.getDefault();
-                            smsManager.sendTextMessage("0648630421", null, "test", null, null);
+                            smsManager.sendTextMessage("0648630421", null, "Premiere chute", null, null);
                             Toast.makeText(getApplicationContext(), "CHUTE 1!",
                                     Toast.LENGTH_LONG).show();
                             nbChutes++;
